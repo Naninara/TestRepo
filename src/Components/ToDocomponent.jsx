@@ -2,10 +2,17 @@ import React, { useState } from "react";
 import TaskComponent from "./TaskComponent";
 
 import ModalBox from "./AddItem.jsx";
+import { useTaskHandler } from "../Hooks/useData";
 
 function ToDocomponent() {
   const [modelOpen, setModelOpen] = useState(false);
   const [modelType, setModelType] = useState("edit");
+  const { data } = useTaskHandler();
+
+  const filterData = data.filter((ele) => {
+    return ele?.status === "To Do";
+  });
+
   return (
     <div className="flex flex-col w-[270px] h-auto mt-[24px] ml-[24px] gap-[20px] relative">
       <div>
@@ -39,9 +46,11 @@ function ToDocomponent() {
           setModelOpen(!modelOpen);
           setModelType("edit");
         }}
-        className="cursor-pointer hover:scale-105 duration-300"
+        className="cursor-pointer gap-3 flex flex-col "
       >
-        <TaskComponent />
+        {filterData.map((ele) => {
+          return <TaskComponent {...ele} />;
+        })}
       </div>
 
       <div>

@@ -3,6 +3,7 @@ import AddItem from "./AddItem";
 
 function CompletedComponent() {
   const [modelOpen, setModelOpen] = useState(false);
+
   return (
     <div className="flex flex-col w-[270px] h-[84px] mt-[24px] ml-[24px] gap-[20px]">
       <div>

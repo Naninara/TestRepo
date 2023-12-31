@@ -1,9 +1,23 @@
 import React, { useState } from "react";
+import { useTaskHandler } from "../Hooks/useData";
 function AddItem({ setModelOpen, modelOpen, modelType }) {
   const [dropDown, setDropDown] = useState();
+  const { addItem } = useTaskHandler();
+
+  const [inputData, setInputData] = useState({ status: "To Do" });
+
+  const [errors, setErrors] = useState(false);
+  const handleSubmit = () => {
+    if (!inputData.eDate || !inputData.sDate || !inputData.name) {
+      setErrors(true);
+      return;
+    }
+    addItem(inputData);
+    setModelOpen(!modelOpen);
+  };
   return (
     <div className="w-full h-screen flex items-center justify-center  fixed top-0 left-0 backdrop-brightness-50 ">
-      <div className="w-[670px] h-[388px] flex flex-col z-20 bg-white rounded-md">
+      <div className="w-[670px] h-auto flex flex-col z-20 bg-white rounded-md">
         <div className="flex w-auto h-[52px] justify-between px-[24px] py-[10px] items-center font-Nunito text-[#263FA0] border-b-2  border-b-[#D8E0FD]">
           <h1>{modelType === "edit" ? "Edit Task" : "Create A Task"}</h1>
           <svg
@@ -22,14 +36,23 @@ function AddItem({ setModelOpen, modelOpen, modelType }) {
             />
           </svg>
         </div>
-        <div className="w-auto h-[284px] px-[24px] py-[16px] flex flex-col gap-[24px]">
+        <div className="w-auto h-[290px] px-[24px] py-[16px] flex flex-col gap-[24px]">
           <div className="w-auto h-[68px] gap-[4px] ">
             <h1>Name of the Task</h1>
             <input
               type={"text"}
               className="h-[44px] px-[12px] py-[4px] w-[622px] border-[1px] border-[#B9C0CB] rounded-md"
               placeholder="Text"
+              onChange={(e) => {
+                setInputData((prev) => ({ ...prev, name: e.target.value }));
+                console.log(inputData);
+              }}
             />
+            {errors && (
+              <p className="text-[12px] font-Nunito my-1 text-red-500">
+                Please Fill The Name
+              </p>
+            )}
           </div>
           <div className="flex gap-[10px] text-[12px]">
             <div className="flex flex-col gap-[4px]">
@@ -38,7 +61,12 @@ function AddItem({ setModelOpen, modelOpen, modelType }) {
                 type={"date"}
                 className="h-[44px] px-[12px] py-[4px] w-[306px] border-[1px] border-[#B9C0CB] rounded-md"
                 placeholder="Text"
+                onChange={(e) => {
+                  setInputData((prev) => ({ ...prev, sDate: e.target.value }));
+                  console.log(inputData);
+                }}
               />
+              {errors && <p className="text-red-500">Please Fill Start Date</p>}
             </div>
             <div className="flex flex-col gap-[4px]">
               <h4>End Date</h4>
@@ -46,7 +74,12 @@ function AddItem({ setModelOpen, modelOpen, modelType }) {
                 type={"date"}
                 className="h-[44px] px-[12px] py-[4px] w-[306px] border-[1px] border-[#B9C0CB] rounded-md"
                 placeholder="Text"
+                onChange={(e) => {
+                  setInputData((prev) => ({ ...prev, eDate: e.target.value }));
+                  console.log(inputData);
+                }}
               />
+              {errors && <p className="text-red-500">Please Fill End Date</p>}
             </div>
           </div>
 
@@ -58,7 +91,7 @@ function AddItem({ setModelOpen, modelOpen, modelType }) {
                 setDropDown(!dropDown);
               }}
             >
-              <h1>To Do</h1>
+              <h1>{inputData.status}</h1>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -75,7 +108,17 @@ function AddItem({ setModelOpen, modelOpen, modelType }) {
             <div className="h-[140px] flex flex-col ">
               {dropDown && (
                 <>
-                  <div className="flex px-[16px] gap-[12px] h-[40px] bg-white cursor-pointer z-30 hover:bg-slate-300 rounded-sm items-center">
+                  <div
+                    className="flex px-[16px] gap-[12px] h-[40px] bg-white cursor-pointer z-30 hover:bg-slate-300 rounded-sm items-center"
+                    onClick={(e) => {
+                      setInputData((prev) => ({
+                        ...prev,
+                        status: "In Progress",
+                      }));
+
+                      console.log(inputData);
+                    }}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -90,7 +133,17 @@ function AddItem({ setModelOpen, modelOpen, modelType }) {
                     </svg>
                     <h4>In Progress</h4>
                   </div>
-                  <div className="flex px-[16px] gap-[12px] h-[40px] bg-white cursor-pointer z-30 hover:bg-slate-300 rounded-sm items-center">
+                  <div
+                    className="flex px-[16px] gap-[12px] h-[40px] bg-white cursor-pointer z-30 hover:bg-slate-300 rounded-sm items-center"
+                    onClick={(e) => {
+                      setInputData((prev) => ({
+                        ...prev,
+                        status: "In Review",
+                      }));
+                      setDropDown(!dropDown);
+                      console.log(inputData);
+                    }}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -106,7 +159,16 @@ function AddItem({ setModelOpen, modelOpen, modelType }) {
                     <h4>In Review</h4>
                   </div>
 
-                  <div className="flex px-[16px] gap-[12px] h-[40px] bg-white cursor-pointer z-30 hover:bg-slate-300 rounded-sm items-center ">
+                  <div
+                    className="flex px-[16px] gap-[12px] h-[40px] bg-white cursor-pointer z-30 hover:bg-slate-300 rounded-sm items-center"
+                    onClick={(e) => {
+                      setInputData((prev) => ({
+                        ...prev,
+                        status: "Completed",
+                      }));
+                      setDropDown(!dropDown);
+                    }}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -135,7 +197,10 @@ function AddItem({ setModelOpen, modelOpen, modelType }) {
           >
             Cancel
           </button>
-          <button className="h-[32px] px-[8px] py-[10px] text-[12px] w-[55px] bg-[#3659E2] flex items-center justify-center text-white flex items-center rounded-md">
+          <button
+            className="h-[32px] px-[8px] py-[10px] text-[12px] w-[55px] bg-[#3659E2] flex items-center justify-center text-white flex items-center rounded-md"
+            onClick={handleSubmit}
+          >
             {modelType === "edit" ? "Save" : "Add"}
           </button>
         </div>
