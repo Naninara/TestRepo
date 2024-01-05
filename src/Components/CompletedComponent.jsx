@@ -1,11 +1,32 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+
 import AddItem from "./AddItem";
+import TaskComponent from "./TaskComponent";
 
 function CompletedComponent() {
   const [modelOpen, setModelOpen] = useState(false);
-
+  const [CompletedTasks, setCompletedTasks] = useState([]);
+  const loginData = useSelector((state) => state.login);
+  const { id, username, password } = loginData;
+  useEffect(() => {
+    loginData &&
+      axios
+        .get(`http://localhost:3500/user/get?id=${id}&status=Completed`, {
+          auth: {
+            username: username,
+            password: password,
+          },
+        })
+        .then((response) => {
+          setCompletedTasks(response.data);
+        })
+        .catch((err) => console.log(err));
+  }, [modelOpen, loginData, username, password, id]);
   return (
-    <div className="flex flex-col w-[270px] h-[84px] mt-[24px] ml-[24px] gap-[20px]">
+    <div className="flex flex-col w-[270px] h-auto mt-[24px] ml-[24px] gap-[20px]">
       <div>
         <button
           className={`flex gap-[10px] items-center bg-[#E7F8E9] px-[12px] py-[4px] text-[#12BB23] rounded-3xl  h-[32px] text-sm`}
@@ -31,6 +52,20 @@ function CompletedComponent() {
           </svg>
           Completed
         </button>
+      </div>
+      <div
+        onClick={() => {
+          setModelOpen(!modelOpen);
+        }}
+        className="cursor-pointer gap-3 flex flex-col "
+      >
+        {CompletedTasks.map((ele) => {
+          return (
+            <Link to={`edit/${ele.id}`}>
+              <TaskComponent {...ele} />
+            </Link>
+          );
+        })}
       </div>
       <button
         className={`flex w-[270px] h-[32px] bg-[#E7F8E9] justify-center text-[#12BB23] items-center gap-[24px] rounded-md`}

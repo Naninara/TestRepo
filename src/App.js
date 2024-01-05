@@ -1,14 +1,21 @@
 import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import EditPage from "./Components/EditPage";
+import Login from "./Components/Login";
 import Menu from "./Components/Menu";
-import Sidebar from "./Components/Sidebar";
-import { UseData } from "./Hooks/useData";
+import Signup from "./Components/Signup";
+
 function App() {
   return (
     <div className="flex">
-      <UseData>
-        <Sidebar />
-        <Menu />
-      </UseData>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/dashboard" element={<Menu />} />
+          <Route path="/edit/:id" element={<EditPage />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }

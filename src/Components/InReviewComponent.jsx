@@ -1,10 +1,34 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+
 import ModalBox from "./AddItem";
+import TaskComponent from "./TaskComponent";
 
 function InReviewComponent() {
   const [modelOpen, setModelOpen] = useState(false);
+  const [InReviewTasks, setInReviewTasks] = useState([]);
+
+  const loginData = useSelector((state) => state.login);
+  const { id, username, password } = loginData;
+
+  useEffect(() => {
+    loginData &&
+      axios
+        .get(`http://localhost:3500/user/get?id=${id}&status=In Review`, {
+          auth: {
+            username: username,
+            password: password,
+          },
+        })
+        .then((response) => {
+          setInReviewTasks(response.data);
+        })
+        .catch((err) => console.log(err));
+  }, [modelOpen, loginData, username, password, id]);
   return (
-    <div className="flex flex-col w-[270px] h-[84px] mt-[24px] ml-[24px] gap-[20px]">
+    <div className="flex flex-col w-[270px] h-auto mt-[24px] ml-[24px] gap-[20px]">
       <div>
         <button
           className={`flex gap-[10px] items-center bg-[#EFF8FF] px-[12px] py-[4px] text-[#3FA1E3] rounded-3xl  h-[32px] text-sm`}
@@ -31,6 +55,23 @@ function InReviewComponent() {
           In Review
         </button>
       </div>
+
+      {
+        <div
+          onClick={() => {
+            setModelOpen(!modelOpen);
+          }}
+          className="cursor-pointer gap-3 flex flex-col "
+        >
+          {InReviewTasks.map((ele) => {
+            return (
+              <Link to={`edit/${ele.id}`}>
+                <TaskComponent {...ele} />
+              </Link>
+            );
+          })}
+        </div>
+      }
 
       <button
         className={`flex w-[270px] h-[32px] bg-[#EFF8FF] justify-center text-[#3FA1E3] items-center gap-[24px] rounded-md`}

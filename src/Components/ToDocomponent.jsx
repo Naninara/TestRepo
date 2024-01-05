@@ -1,17 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TaskComponent from "./TaskComponent";
 
 import ModalBox from "./AddItem.jsx";
-import { useTaskHandler } from "../Hooks/useData";
+
+import axios from "axios";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function ToDocomponent() {
   const [modelOpen, setModelOpen] = useState(false);
-  const [modelType, setModelType] = useState("edit");
-  const { data } = useTaskHandler();
 
-  const filterData = data.filter((ele) => {
-    return ele?.status === "To Do";
-  });
+  const [ToDoTask, setToDoTasks] = useState([]);
+  const loginData = useSelector((state) => state.login);
+  const { id, username, password } = loginData;
+
+  useEffect(() => {
+    loginData &&
+      axios
+        .get(`http://localhost:3500/user/get?id=${id}&status=To Do`, {
+          auth: {
+            username: username,
+            password: password,
+          },
+        })
+        .then((response) => {
+          setToDoTasks(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+  }, [modelOpen, loginData, username, password, id]);
 
   return (
     <div className="flex flex-col w-[270px] h-auto mt-[24px] ml-[24px] gap-[20px] relative">
@@ -44,12 +62,15 @@ function ToDocomponent() {
       <div
         onClick={() => {
           setModelOpen(!modelOpen);
-          setModelType("edit");
         }}
         className="cursor-pointer gap-3 flex flex-col "
       >
-        {filterData.map((ele) => {
-          return <TaskComponent {...ele} />;
+        {ToDoTask.map((ele) => {
+          return (
+            <Link to={`edit/${ele.id}`}>
+              <TaskComponent {...ele} />
+            </Link>
+          );
         })}
       </div>
 
@@ -57,7 +78,6 @@ function ToDocomponent() {
         <button
           onClick={() => {
             setModelOpen(!modelOpen);
-            setModelType("create");
           }}
           className={`flex w-[270px] h-[32px] bg-[#EBEEFC] justify-center text-[#3659E2] items-center gap-[24px] rounded-md`}
         >
@@ -79,11 +99,7 @@ function ToDocomponent() {
       </div>
       {modelOpen && (
         <div className="z-50">
-          <ModalBox
-            setModelOpen={setModelOpen}
-            modelOpen={modelOpen}
-            modelType={modelType}
-          />
+          <ModalBox setModelOpen={setModelOpen} modelOpen={modelOpen} />
         </div>
       )}
     </div>
